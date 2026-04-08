@@ -18,23 +18,23 @@
  * limitations under the License.
  */
 
-import AgentEdit from './components/AgentEdit';
-import ControlTray from './components/console/control-tray/ControlTray';
-import DebugModal from './components/DebugModal';
-import ErrorScreen from './components/demo/ErrorScreen';
-import KeynoteCompanion from './components/demo/keynote-companion/KeynoteCompanion';
-import Header from './components/Header';
-import UserSettings from './components/UserSettings';
-import WelcomeScreen from './components/WelcomeScreen';
-import { LiveAPIProvider, useLiveAPIContext } from './contexts/LiveAPIContext';
-import { useAgent, useUI } from './lib/state';
+import AgentEdit from './AgentEdit';
+import ControlTray from './console/ControlTray';
+import DebugModal from '../DebugModal';
+import ErrorScreen from '../ErrorScreen';
+import KeynoteCompanion from '../KeynoteCompanion';
+import Header from '../Header';
+import UserSettings from '../UserSettings';
+import WelcomeScreen from '../WelcomeScreen';
+import { LiveAPIProvider, useLiveAPIContext } from '../LiveAPIContext';
+import { useAgent, useUI } from '../state';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import LegalDisclaimer from './components/LegalDisclaimer';
-import { themes } from './lib/themes';
-import BasicFace from './components/demo/basic-face/BasicFace';
+import LegalDisclaimer from '../LegalDisclaimer';
+import { themes } from '../themes';
+import BasicFace from '../BasicFace';
 import cn from 'classnames';
-import FloatingControls from './components/FloatingControls';
-import HelpModal from './components/HelpModal';
+import FloatingControls from '../FloatingControls';
+import HelpModal from '../HelpModal';
 
 const API_KEY =
   typeof process !== 'undefined' && process.env
