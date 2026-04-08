@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import { useUI } from '../lib/state';
+import { useUI } from './lib/state';
 
 export default function FloatingControls() {
   const { setShowHelpModal, theme, setTheme } = useUI();
