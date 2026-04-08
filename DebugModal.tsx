@@ -8,13 +8,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useSessionStore } from .//lib/state';
+import { useSessionStore } from ./lib/state';
 import Modal from './Modal';
-import { useUI } from .//lib/state';
+import { useUI } from ./lib/state';
 import React, { useEffect, useMemo, useState } from 'react';
 import { marked } from 'marked';
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
-import { encodeWAV, getAudioDuration } from .//lib/utils';
+import { encodeWAV, getAudioDuration } from ./lib/utils';
 
 // Retrieve the API key from the environment.
 const API_KEY =
