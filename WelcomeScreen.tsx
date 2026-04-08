@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { useEffect, useState } from 'react';
-import { useUI } from '../lib/state';
+import { useUI } from './lib/state';
 
 declare global {
   interface Window {
