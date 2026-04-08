@@ -8,7 +8,7 @@ import {
   INTERLOCUTOR_VOICE,
   INTERLOCUTOR_VOICES,
 } from '../lib/presets/agents';
-import Modal from './Modal';
+import Modal from '../Modal';
 import { useAgent, useUI } from '../lib/state';
 
 /**
