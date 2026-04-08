@@ -19,7 +19,6 @@
  */
 
 import AgentEdit from './components/AgentEdit';
-import ControlTray from './components/console/control-tray/ControlTray';
 import DebugModal from './components/DebugModal';
 import ErrorScreen from './components/demo/ErrorScreen';
 import KeynoteCompanion from './components/demo/keynote-companion/KeynoteCompanion';
