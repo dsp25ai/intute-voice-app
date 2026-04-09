@@ -1,20 +1,15 @@
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
-*/
-
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useSessionStore } from ./lib/state';
+import { useSessionStore } from './lib/state';
 import Modal from './Modal';
-import { useUI } from ./lib/state';
+import { useUI } from './lib/state';
 import React, { useEffect, useMemo, useState } from 'react';
 import { marked } from 'marked';
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
-import { encodeWAV, getAudioDuration } from ./lib/utils';
+import { encodeWAV, getAudioDuration } from './lib/utils';
 
 // Retrieve the API key from the environment.
 const API_KEY =
@@ -37,7 +32,7 @@ function formatBytes(bytes: number, decimals = 2) {
 
 /**
  * DebugModal Component (Session Info)
- * 
+ *
  * This component provides a detailed view of the current learning session.
  * It allows users to view a word-for-word transcript, generate a summary of the lesson,
  * and listen to or download audio recordings of the conversation.
@@ -45,7 +40,7 @@ function formatBytes(bytes: number, decimals = 2) {
 export default function DebugModal() {
   // Access session data (transcript and audio logs) from the global store.
   const { transcript, audioLog } = useSessionStore();
-  
+
   // Access UI state to control modal visibility and track teacher edits.
   const {
     setShowDebugModal,
@@ -59,14 +54,13 @@ export default function DebugModal() {
   // State for the AI-generated summary feature.
   const [correctedTranscript, setCorrectedTranscript] = useState('');
   const [isCorrectingTranscript, setIsCorrectingTranscript] = useState(false);
-  
+
   // State for managing audio playback within the audio log tab.
   const [playingAudio, setPlayingAudio] = useState<{
     index: number;
     element: HTMLAudioElement;
     url: string;
   } | null>(null);
-
 
   /**
    * Effect: Memory Usage Polling
@@ -75,12 +69,10 @@ export default function DebugModal() {
   useEffect(() => {
     const memory = (performance as any).memory;
     if (!memory) return;
-
     const interval = setInterval(() => {
       setMemoryUsage(memory.usedJSHeapSize);
     }, 1000);
     setMemoryUsage(memory.usedJSHeapSize);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -95,67 +87,44 @@ export default function DebugModal() {
     setCorrectedTranscript('Generating summary...');
     const model = 'gemini-2.5-flash';
     const TIMEOUT_SECONDS = 20;
-
     try {
-      // Prepare the transcript for the model.
       const fullTranscript = transcript
         .map(t => `${t.speaker}: ${t.text}`)
         .join('\n');
-      
       const prompt = `Please summarize the following lesson transcript into clear, concise minutes using Markdown. \n\nTranscript:\n\n${fullTranscript}`;
-      
-      // Implement a timeout to prevent the UI from hanging on long API calls.
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(
-          () =>
-            reject(
-              new Error(
-                `The model call to ${model} has timed out after ${TIMEOUT_SECONDS} seconds.`
-              )
-            ),
+          () => reject(new Error(`The model call to ${model} has timed out after ${TIMEOUT_SECONDS} seconds.`)),
           TIMEOUT_SECONDS * 1000
         )
       );
-
-      // Race the API call against the timeout.
       const response = await Promise.race([
-        ai.models.generateContent({
-          model,
-          contents: prompt,
-        }),
+        ai.models.generateContent({ model, contents: prompt }),
         timeoutPromise,
       ]);
-
       const corrected = (response as GenerateContentResponse).text;
       setCorrectedTranscript(corrected ?? 'Summary generation returned an empty response.');
     } catch (error: any) {
       console.error('Error generating summary:', error);
-      setCorrectedTranscript(
-        `Sorry, an error occurred while generating the summary: ${error.message}`
-      );
+      setCorrectedTranscript(`Sorry, an error occurred while generating the summary: ${error.message}`);
     } finally {
       setIsCorrectingTranscript(false);
     }
   };
-  
+
   /**
    * Toggles playback for a specific audio clip in the audio log.
-   * Handles creating and revoking object URLs to manage memory efficiently.
    */
   const toggleAudioPlayback = (index: number, blob: Blob) => {
     if (playingAudio && playingAudio.index === index) {
-      // If the same clip is clicked, stop it.
       playingAudio.element.pause();
       URL.revokeObjectURL(playingAudio.url);
       setPlayingAudio(null);
     } else {
-      // If a different clip is clicked, stop the current one and start the new one.
       if (playingAudio) {
         playingAudio.element.pause();
         URL.revokeObjectURL(playingAudio.url);
       }
-      
-      // Create a temporary URL for the audio blob.
       const url = URL.createObjectURL(encodeWAV(blob as any, 24000));
       const audio = new Audio(url);
       audio.onended = () => setPlayingAudio(null);
@@ -173,8 +142,6 @@ export default function DebugModal() {
     const arrayBuffer = await combinedBlob.arrayBuffer();
     const wavBlob = encodeWAV(arrayBuffer, 24000);
     const url = URL.createObjectURL(wavBlob);
-    
-    // Create a hidden link and click it to trigger the browser download.
     const a = document.createElement('a');
     a.href = url;
     a.download = `intute_audio_log_${new Date().toISOString()}.wav`;
@@ -186,124 +153,90 @@ export default function DebugModal() {
 
   return (
     <Modal onClose={() => setShowDebugModal(false)} className="debug-modal-container">
-      <div className="debug-modal">
-        {/* Header: Title and Session Statistics */}
-        <div className="debug-header">
-          <div className="debug-header-top">
-            <h2>Session Info</h2>
-          </div>
-          <div className="debug-stats">
-            {memoryUsage !== null && <div className="stat-item"><strong>Memory:</strong> {formatBytes(memoryUsage)}</div>}
-            {changeCount > 0 && (
-              <div className="stat-item">
-                <strong>Teacher Edits:</strong> {changeCount}
-              </div>
-            )}
-          </div>
-          
-          {/* Navigation Tabs */}
-          <div className="debug-tabs">
-            <button
-              onClick={() => setActiveTab('transcript')}
-              className={activeTab === 'transcript' ? 'active' : ''}
-            >
-              Transcript
-            </button>
-            <button
-              onClick={() => setActiveTab('minutes')}
-              className={activeTab === 'minutes' ? 'active' : ''}
-            >
-              Summary
-            </button>
-            <button
-              onClick={() => setActiveTab('audiolog')}
-              className={activeTab === 'audiolog' ? 'active' : ''}
-            >
-              Audio Log
-            </button>
-          </div>
-        </div>
-
-        {/* Tab Content: Transcript View */}
-        {activeTab === 'transcript' && (
-            <div className="transcript-content" style={{ overflowY: 'auto', flexGrow: 1, padding: '16px' }}>
-              {transcript.length > 0 ? (
-                  transcript.map((entry, index) => (
-                    <p key={index} className="transcript-entry" style={{ marginBottom: '12px' }}>
-                      <strong style={{ color: 'var(--theme-accent)' }}>{entry.speaker}:</strong> {entry.text}
-                    </p>
-                  ))
-              ) : (
-                  <p style={{ opacity: 0.6, fontStyle: 'italic' }}>No conversation yet.</p>
-              )}
-            </div>
+      {/* Header: Title and Session Statistics */}
+      <div className="debug-modal-header">
+        <h2>Session Info</h2>
+        {memoryUsage !== null && (
+          <span><strong>Memory:</strong> {formatBytes(memoryUsage)}</span>
         )}
-
-        {/* Tab Content: Summary Generation View */}
-        {activeTab === 'minutes' && (
-            <div className="debug-log-container" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="debug-controls" style={{ padding: '16px', borderBottom: '1px solid #ccc' }}>
-                    <button onClick={handleGetMinutes} className="button primary" disabled={transcript.length === 0 || isCorrectingTranscript}>
-                        {isCorrectingTranscript ? 'Generating...' : 'Generate Summary'}
-                    </button>
-                </div>
-                <div className="prose-view" style={{ padding: '24px', overflowY: 'auto', flexGrow: 1 }}>
-                     {correctedTranscript ? (
-                         <div dangerouslySetInnerHTML={{ __html: marked.parse(correctedTranscript) }} />
-                     ) : (
-                         <p style={{ opacity: 0.6, fontStyle: 'italic' }}>Click generate to see a summary of the session.</p>
-                     )}
-                </div>
-            </div>
-        )}
-
-        {/* Tab Content: Audio Log and Playback View */}
-        {activeTab === 'audiolog' && (
-            <div className="audio-log-view" style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
-              <div className="audio-log-controls" style={{ padding: '16px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                <button
-                  onClick={handleSaveAudioLog}
-                  disabled={audioLog.length === 0}
-                  className="button"
-                >
-                  Download Complete Audio (WAV)
-                </button>
-              </div>
-              <div className="audio-log-content" style={{ flexGrow: 1, overflowY: 'auto', padding: '16px' }}>
-                <div className="audio-log-header" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', fontWeight: 'bold', marginBottom: '8px' }}>
-                  <div>Timestamp</div>
-                  <div>Speaker</div>
-                  <div>Duration</div>
-                  <div className="audio-log-playback" style={{ textAlign: 'right' }}>Playback</div>
-                </div>
-                {audioLog.length > 0 ? (
-                  audioLog.map((entry, index) => (
-                    <div key={index} className="audio-log-entry" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                      <div>{entry.timestamp.toLocaleTimeString()}</div>
-                      <div>{entry.speaker}</div>
-                      <div>{getAudioDuration(entry.blob)}</div>
-                      <div className="audio-log-playback" style={{ textAlign: 'right' }}>
-                        <button
-                          className="play-audio-button"
-                          onClick={() => toggleAudioPlayback(index, entry.blob)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--theme-accent)' }}
-                        >
-                          <span className="icon">
-                            {playingAudio?.index === index ? 'pause_circle' : 'play_circle'}
-                          </span>
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="audio-log-empty" style={{ textAlign: 'center', padding: '40px', opacity: 0.6 }}>
-                    <p>No audio recorded yet.</p>
-                  </div>
-                )}
-              </div>
-            </div>
+        {changeCount > 0 && (
+          <span><strong>Teacher Edits:</strong> {changeCount}</span>
         )}
       </div>
+
+      {/* Navigation Tabs */}
+      <div className="debug-modal-tabs">
+        <button onClick={() => setActiveTab('transcript')} className={activeTab === 'transcript' ? 'active' : ''}>Transcript</button>
+        <button onClick={() => setActiveTab('minutes')} className={activeTab === 'minutes' ? 'active' : ''}>Summary</button>
+        <button onClick={() => setActiveTab('audiolog')} className={activeTab === 'audiolog' ? 'active' : ''}>Audio Log</button>
+      </div>
+
+      {/* Tab Content: Transcript View */}
+      {activeTab === 'transcript' && (
+        <div className="debug-modal-content">
+          {transcript.length > 0 ? (
+            transcript.map((entry, index) => (
+              <p key={index}><strong>{entry.speaker}:</strong> {entry.text}</p>
+            ))
+          ) : (
+            <p>No conversation yet.</p>
+          )}
+        </div>
+      )}
+
+      {/* Tab Content: Summary Generation View */}
+      {activeTab === 'minutes' && (
+        <div className="debug-modal-content">
+          <button onClick={handleGetMinutes} disabled={isCorrectingTranscript}>
+            {isCorrectingTranscript ? 'Generating...' : 'Generate Summary'}
+          </button>
+          {correctedTranscript ? (
+            <div dangerouslySetInnerHTML={{ __html: marked(correctedTranscript) as string }} />
+          ) : (
+            <p>Click generate to see a summary of the session.</p>
+          )}
+        </div>
+      )}
+
+      {/* Tab Content: Audio Log and Playback View */}
+      {activeTab === 'audiolog' && (
+        <div className="debug-modal-content">
+          <button onClick={handleSaveAudioLog}>Download Complete Audio (WAV)</button>
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Speaker</th>
+                <th>Duration</th>
+                <th>Playback</th>
+              </tr>
+            </thead>
+            <tbody>
+              {audioLog.length > 0 ? (
+                audioLog.map((entry, index) => (
+                  <tr key={index}>
+                    <td>{entry.timestamp.toLocaleTimeString()}</td>
+                    <td>{entry.speaker}</td>
+                    <td>{getAudioDuration(entry.blob)}</td>
+                    <td>
+                      <button
+                        onClick={() => toggleAudioPlayback(index, entry.blob)}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--theme-accent)' }}
+                      >
+                        <span className="material-symbols-outlined">
+                          {playingAudio?.index === index ? 'pause_circle' : 'play_circle'}
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={4}>No audio recorded yet.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
     </Modal>
   );
 }
