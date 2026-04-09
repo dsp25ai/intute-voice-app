@@ -9,7 +9,7 @@
  */
 
 import Modal from './Modal';
-import { useUI } from '../lib/state';
+import { useUI } from './lib/state';
 
 /**
  * HelpModal Component
