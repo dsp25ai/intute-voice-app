@@ -4,7 +4,7 @@
 */
 import React from 'react';
 import Modal from './Modal';
-import { useAgent, useUI, useUser } from '../lib/state';
+import { useAgent, useUI, useUser } from './lib/state';
 
 /**
  * A modal for configuring user settings for the learning session.
