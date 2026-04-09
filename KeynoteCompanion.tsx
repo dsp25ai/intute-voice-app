@@ -26,10 +26,10 @@ import { marked } from 'marked';
 // import html2pdf from 'html2pdf.js';
 import { jsPDF } from 'jspdf';
 import * as htmlToImage from 'html-to-image';
-import { themes } from '../../../lib/themes';
+import { themes } from './lib/themes';
 
-import { useLiveAPIContext } from '../../../contexts/LiveAPIContext';
-import { createSystemInstructions } from '../../../lib/prompts';
+import { useLiveAPIContext } from './contexts/LiveAPIContext';
+import { createSystemInstructions } from './lib/prompts';
 import {
   useAgent,
   useInsertStore,
@@ -41,8 +41,8 @@ import {
   Insert,
   GraphData,
   ImageInsert,
-} from '../../../lib/state';
-import Modal from '../../Modal';
+} from './lib/state';
+import Modal from './Modal';
 import FunctionPlotter from './FunctionPlotter';
 
 const API_KEY =
