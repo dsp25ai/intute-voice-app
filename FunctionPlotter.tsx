@@ -3,10 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
 import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import {
   LineChart,
@@ -20,7 +16,7 @@ import {
   ReferenceLine
 } from 'recharts';
 import c from 'classnames';
-import { GraphData } from '../../../lib/state';
+import { GraphData } from './lib/state';
 
 // Define a default color palette for the plots if not provided.
 // Using a high-contrast palette for better distinction.
