@@ -19,7 +19,7 @@
  */
 
 import React, { createContext, FC, ReactNode, useContext } from 'react';
-import { useLiveApi, UseLiveApiResults } from ../hooks/media/use-live-api';
+import { useLiveApi, UseLiveApiResults } from './hooks/media/use-live-api';
 
 // Create a React context to hold the results of the useLiveApi hook.
 const LiveAPIContext = createContext<UseLiveApiResults | undefined>(undefined);
