@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import { useEffect, useRef, useState } from 'react';
-import { useLiveAPIContext } from '../../contexts/LiveAPIContext';
-
+import { useLiveAPIContext } from './contexts/LiveAPIContext';
 export type FaceResults = {
   /** A value that represents how open the eyes are. */
   eyesScale: number;
