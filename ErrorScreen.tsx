@@ -2,9 +2,9 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { useLiveAPIContext } from '../../contexts/LiveAPIContext';
+import { useLiveAPIContext } from './contexts/LiveAPIContext';
 import React, { useEffect, useState } from 'react';
-import { StreamingLog } from '../../lib/genai-live-client';
+import { StreamingLog } from './lib/genai-live-client';
 
 export interface ExtendedErrorType {
   code?: number;
