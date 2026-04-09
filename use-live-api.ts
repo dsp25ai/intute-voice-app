@@ -19,13 +19,13 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { GenAILiveClient } from '../../lib/genai-live-client';
+import { GenAILiveClient } from './lib/genai-live-client';
 import { LiveConnectConfig } from '@google/genai';
-import { AudioStreamer } from '../../lib/audio-streamer';
-import { audioContext } from '../../lib/utils';
-import VolMeterWorket from '../../lib/worklets/vol-meter';
-import { DEFAULT_LIVE_API_MODEL } from '../../lib/constants';
-import { usePerfLogStore } from '../../lib/state';
+import { AudioStreamer } from './lib/audio-streamer';
+import { audioContext } from './lib/utils';
+import VolMeterWorket from './lib/worklets/vol-meter';
+import { DEFAULT_LIVE_API_MODEL } from './lib/constants';
+import { usePerfLogStore } from './lib/state';
 
 /**
  * The shape of the object returned by the `useLiveApi` hook.
